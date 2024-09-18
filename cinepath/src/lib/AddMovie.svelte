@@ -1,0 +1,191 @@
+<script>
+
+    let showAddMovie = false;
+
+    function toggleAddMovie() {
+        showAddMovie = !showAddMovie;
+    }
+
+    function hideAddMovie() {
+        showAddMovie = false;
+    }
+
+    let searchQuery = '';
+    let movieResults = [];
+    let selectedMovie = null;
+    let moviePreview = '';
+
+    const apiKey = '0096777d7833f21a0d85007d126fe9ec';
+
+    async function searchMovies(query) {
+        if (query.length > 3) {
+            const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}`);
+            const data = await response.json();
+            movieResults = data.results;
+        } else {
+            movieResults = [];
+        }
+    }
+
+    function selectMovie(movie) {
+        selectedMovie = movie;
+        moviePreview = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        searchQuery = movie.title;
+        movieResults = ['test'];
+        console.log(movie)
+    }
+
+    $: searchMovies(searchQuery);
+    </script>
+
+<style>
+    .addmovie {
+        display: none;
+    }
+    .addmovie.show {
+        display: block;
+    }
+    .moviepopup {
+        position: fixed;
+        z-index: 4;
+        line-height: 1.5;
+        backdrop-filter: blur(10px);
+        height: 100%;
+        width: 40%;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        padding: 20px;
+        font-size: 0.8em;
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(to bottom right, #000, #000);
+        opacity: 0.6;
+        z-index: 3;
+    }
+
+    .star-rating {
+        display: flex;
+        direction: row;
+        align-items: center;
+    }
+
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating label {
+        color: #6d6d6d;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+
+    .star-rating input[type="radio"]:checked ~ label {
+        color: #fff;
+    }
+
+    .star-rating input[type="radio"]:checked ~ label ~ label {
+        color: #6d6d6d;
+    }
+
+    .moviepreview{
+        width: 300px;
+        height: 400px;
+        background-color: #000;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .movie-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    button {
+        margin: 4px;
+        padding: 5px 20px;
+        border-radius: 20px;
+        background-color: white;
+        color: black;
+        border: 1px solid white;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+        -webkit-transition: all 0.5s;
+        transition: all 0.5s;
+        }
+
+    button:hover {
+        background-color: transparent;
+        color: white;
+    }
+
+    </style>
+
+<br /><br /><br />
+<a href="#add" class="btn" on:click|preventDefault={toggleAddMovie}>I JUST WATCHED A MOVIE</a>
+
+<div class="addmovie {showAddMovie ? 'show' : ''}">
+    <div class="overlay"></div>
+    <div class="moviepopup">
+        <a  on:click={hideAddMovie} class="btn" href="#close">Close</a>
+        <br />
+        <h2>ADD A MOVIE</h2>
+        <br />
+        {#if moviePreview}
+        <div style="background-image: url('{moviePreview || ''}');" class="moviepreview"></div>
+        <br /><br />
+        {/if}
+        <p>What is the movie called?</p>
+        <input
+            placeholder="Search for a movie"
+            type="text"
+            bind:value={searchQuery}
+        />
+        {#if movieResults.length > 0}
+            <div class="movie-list">
+                {#each movieResults as movie}
+                    <button 
+                        class="movieoptions"
+                        on:click={() => selectMovie(movie)}
+                        on:keydown={(e) => e.key === 'Enter' && selectMovie(movie)}
+                        role="option"
+                        aria-selected={selectedMovie === movie ? 'true' : 'false'}
+                        aria-label={`Select ${movie.title}`}
+                    >
+                        {movie.title}
+                    </button>
+                {/each}
+            </div>
+        {/if}
+        <br /><br /><br />
+        <p>How many stars would you give?</p>
+        <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5">
+            <label for="star5">5 stars</label>
+            <input type="radio" id="star4" name="rating" value="4">
+            <label for="star4">4 stars</label>
+            <input type="radio" id="star3" name="rating" value="3">
+            <label for="star3">3 stars</label>
+            <input type="radio" id="star2" name="rating" value="2">
+            <label for="star2">2 stars</label>
+            <input type="radio" id="star1" name="rating" value="1">
+            <label for="star1">1 star</label>
+        </div>
+        <br /><br />
+        <p>Tell us your thoughts!</p>
+        <textarea
+        placeholder="Start writing"
+        id="thoughts"
+        name="thoughts"
+        />
+        <br /><br /><br />
+        </div>
+    </div>
