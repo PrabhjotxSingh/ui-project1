@@ -1,5 +1,10 @@
 <script>
+    import Swal from 'sweetalert2'
+    import { createEventDispatcher } from 'svelte';
+    const dispatch = createEventDispatcher();
 
+    let rating = '';
+    let thoughts = '';
     let showAddMovie = false;
     let now = new Date();
     let datetime = now.toLocaleString();
@@ -31,17 +36,82 @@
 
     function selectMovie(movie) {
         selectedMovie = movie;
-        moviePreview = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        moviePreview = `https://image.tmdb.org/t/p/w300${movie.poster_path}`;
         disableSearch = true;
         searchQuery = movie.title;
+        console.log(movie);
         setTimeout(() => {
             disableSearch = false;
         }, 100);
         movieResults = [];
     }
 
-    $: searchMovies(searchQuery);
+    function resetForm() {
+        searchQuery = '';
+        movieResults = [];
+        selectedMovie = null;
+        rating = '';
+        thoughts = '';
+        datetime = new Date().toLocaleString();
+        moviePreview = "";
+    }
 
+    const genreMap = {
+        28: "Action",
+        12: "Adventure",
+        16: "Animation",
+        35: "Comedy",
+        80: "Crime",
+        99: "Documentary",
+        18: "Drama",
+        10751: "Family",
+        14: "Fantasy",
+        36: "History",
+        27: "Horror",
+        10402: "Music",
+        9648: "Mystery",
+        10749: "Romance",
+        878: "Science Fiction",
+        10770: "TV Movie",
+        53: "Thriller",
+        10752: "War",
+        37: "Western"
+    };
+
+    function submitForm() {
+        if (selectedMovie && rating && thoughts) {
+            const tags = selectedMovie.genre_ids.map(id => genreMap[id] || 'Unknown');
+            dispatch('addMovie', {
+                name: selectedMovie.title,
+                rating: rating,
+                userReview: thoughts,
+                reviewTime: datetime,
+                description: selectedMovie.description || '',
+                tags: tags || [],
+                posterUrl: "https://image.tmdb.org/t/p/w300/" + selectedMovie.poster_path || ''
+            });
+            hideAddMovie();
+            resetForm();
+            Swal.fire({
+                    title: 'MOVIE ADDED',
+                    text: 'Your movie is logged onto CINEPATH!',
+                    icon: 'success',
+                    confirmButtonText: 'SICK!'
+            })
+        }
+
+        else{
+            Swal.fire({
+                    title: 'FAILED TO ADD',
+                    text: 'Looks like your movie failed to add, check to make sure all fields are filled in and a movie was selected from the results.',
+                    icon: 'error',
+                    confirmButtonText: 'I WILL TRY AGAIN!',
+                    confirmButtonColor: "#000"
+            })
+        }
+    }
+
+    $: searchMovies(searchQuery);
     </script>
 
 <style>
@@ -139,7 +209,7 @@
         bottom: 0;
         margin: 20px;
         border-radius: 50%;
-        padding: 10px;
+        padding: 20px;
         background-color: white;
         color: black;
         border: 1px solid white;
@@ -199,15 +269,15 @@
         <br /><br /><br />
         <p>How many stars would you give?</p>
         <div class="star-rating">
-            <input type="radio" id="star5" name="rating" value="5">
+            <input type="radio" id="star5" name="rating" value="5" bind:group={rating}>
             <label for="star5">5 Stars</label>
-            <input type="radio" id="star4" name="rating" value="4">
+            <input type="radio" id="star4" name="rating" value="4" bind:group={rating}>
             <label for="star4">4 Stars</label>
-            <input type="radio" id="star3" name="rating" value="3">
+            <input type="radio" id="star3" name="rating" value="3" bind:group={rating}>
             <label for="star3">3 Stars</label>
-            <input type="radio" id="star2" name="rating" value="2">
+            <input type="radio" id="star2" name="rating" value="2" bind:group={rating}>
             <label for="star2">2 Stars</label>
-            <input type="radio" id="star1" name="rating" value="1">
+            <input type="radio" id="star1" name="rating" value="1" bind:group={rating}>
             <label for="star1">1 Star</label>
         </div>
         <br /><br />
@@ -216,11 +286,12 @@
         placeholder="Start writing"
         id="thoughts"
         name="thoughts"
+        bind:value={thoughts}
         />
         <br /><br /><br />
         <p>Log time: {datetime}</p>
         <br /><br />
-        <a href="#add" class="btn">ADD THIS MOVIE!</a>
+        <a on:click={submitForm} href="#add" class="btn">ADD THIS MOVIE</a>
         <br /><br /><br />
         </div>
     </div>

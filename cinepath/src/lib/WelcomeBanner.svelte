@@ -1,6 +1,8 @@
 <script>
-  import AddMovie from "./AddMovie.svelte";
+    import AddMovie from "./AddMovie.svelte";
+    import { createEventDispatcher } from 'svelte';
 
+    const dispatch = createEventDispatcher();
     let movieName = '';
     let backdropUrl = '';
     let genres = [];
@@ -10,7 +12,7 @@
     const API_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
     const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/original';
 
-    // Why did the API store it as numbers? IDK!!!
+    // API stores genres as numbers, which is stupid
     const genreMap = {
         28: "Action",
         12: "Adventure",
@@ -50,6 +52,10 @@
         }
     };
 
+    function handleAddMovie(event) {
+        dispatch('addMovie', event.detail);
+    }
+
     fetchPopularMovie();
 </script>
 
@@ -64,6 +70,8 @@
         padding-left: 20px;
         background-size: cover;
         background-position: center;
+        position: relative;
+        overflow: hidden;
     }
 
     .banner::before {
@@ -72,9 +80,20 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 90%;
-        background: rgba(0, 0, 0, 0.6);
+        height: 100%;
+        background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.6) 0%,
+                rgba(0, 0, 0, 0.6) 60%,
+                rgba(0, 0, 0, 0) 70%
+            ),
+            linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0) 60%,
+                black 100%
+            );
         z-index: 1;
+        pointer-events: none;
     }
 
     .branding{
@@ -107,9 +126,9 @@
 <a href="/"><div class="branding"><b>CINE</b>PATH</div></a>
 <div class="banner" style="background-image: url('{backdropUrl}');">
     <div class="centered-text">
-        <h2>Welcome back Prabh, here's a recommendation</h2>
+        <h2>Hello Prabh, here's what's trending</h2>
         <h1>{movieName}</h1>
         <h2><div class="tags">{movieGenres}</div></h2>
-        <AddMovie />
+        <AddMovie on:addMovie={handleAddMovie} />
     </div>
 </div>
