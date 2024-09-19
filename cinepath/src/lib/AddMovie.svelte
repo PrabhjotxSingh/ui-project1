@@ -1,6 +1,13 @@
 <script>
 
     let showAddMovie = false;
+    let now = new Date();
+    let datetime = now.toLocaleString();
+    let searchQuery = '';
+    let movieResults = [];
+    let selectedMovie = null;
+    let moviePreview = '';
+    let disableSearch = false;
 
     function toggleAddMovie() {
         showAddMovie = !showAddMovie;
@@ -10,15 +17,10 @@
         showAddMovie = false;
     }
 
-    let searchQuery = '';
-    let movieResults = [];
-    let selectedMovie = null;
-    let moviePreview = '';
-
     const apiKey = '0096777d7833f21a0d85007d126fe9ec';
 
     async function searchMovies(query) {
-        if (query.length > 3) {
+        if (query.length >= 3 && !disableSearch) {
             const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}`);
             const data = await response.json();
             movieResults = data.results;
@@ -30,12 +32,16 @@
     function selectMovie(movie) {
         selectedMovie = movie;
         moviePreview = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        disableSearch = true;
         searchQuery = movie.title;
-        movieResults = ['test'];
-        console.log(movie)
+        setTimeout(() => {
+            disableSearch = false;
+        }, 100);
+        movieResults = [];
     }
 
     $: searchMovies(searchQuery);
+
     </script>
 
 <style>
@@ -49,7 +55,7 @@
         position: fixed;
         z-index: 4;
         line-height: 1.5;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(20px);
         height: 100%;
         width: 40%;
         top: 0;
@@ -66,7 +72,7 @@
         width: 100%;
         height: 100%;
         background-image: linear-gradient(to bottom right, #000, #000);
-        opacity: 0.6;
+        opacity: 0.8;
         z-index: 3;
     }
 
@@ -127,21 +133,46 @@
         color: white;
     }
 
+    .alwaysbtn {
+        position: fixed;
+        right:0;
+        bottom: 0;
+        margin: 20px;
+        border-radius: 50%;
+        padding: 10px;
+        background-color: white;
+        color: black;
+        border: 1px solid white;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+        -webkit-transition: all 0.5s;
+        transition: all 0.5s;
+        }
+
+    .alwaysbtn:hover {
+        background-color: transparent;
+        color: white;
+    }
+
     </style>
 
 <br /><br /><br />
+
+<a href="#add" class="alwaysbtn" on:click|preventDefault={toggleAddMovie}>+</a>
+
 <a href="#add" class="btn" on:click|preventDefault={toggleAddMovie}>I JUST WATCHED A MOVIE</a>
 
 <div class="addmovie {showAddMovie ? 'show' : ''}">
     <div class="overlay"></div>
     <div class="moviepopup">
-        <a  on:click={hideAddMovie} class="btn" href="#close">Close</a>
+        <a  on:click={hideAddMovie} class="btn_close" href="#close">✖</a>
         <br />
         <h2>ADD A MOVIE</h2>
         <br />
         {#if moviePreview}
         <div style="background-image: url('{moviePreview || ''}');" class="moviepreview"></div>
-        <br /><br />
+        <br />
         {/if}
         <p>What is the movie called?</p>
         <input
@@ -169,15 +200,15 @@
         <p>How many stars would you give?</p>
         <div class="star-rating">
             <input type="radio" id="star5" name="rating" value="5">
-            <label for="star5">5 stars</label>
+            <label for="star5">5 Stars</label>
             <input type="radio" id="star4" name="rating" value="4">
-            <label for="star4">4 stars</label>
+            <label for="star4">4 Stars</label>
             <input type="radio" id="star3" name="rating" value="3">
-            <label for="star3">3 stars</label>
+            <label for="star3">3 Stars</label>
             <input type="radio" id="star2" name="rating" value="2">
-            <label for="star2">2 stars</label>
+            <label for="star2">2 Stars</label>
             <input type="radio" id="star1" name="rating" value="1">
-            <label for="star1">1 star</label>
+            <label for="star1">1 Star</label>
         </div>
         <br /><br />
         <p>Tell us your thoughts!</p>
@@ -186,6 +217,10 @@
         id="thoughts"
         name="thoughts"
         />
+        <br /><br /><br />
+        <p>Log time: {datetime}</p>
+        <br /><br />
+        <a href="#add" class="btn">ADD THIS MOVIE!</a>
         <br /><br /><br />
         </div>
     </div>

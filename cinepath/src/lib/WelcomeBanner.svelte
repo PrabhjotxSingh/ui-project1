@@ -56,7 +56,7 @@
 <style>
     .banner {
         width: 100%;
-        height: 100vh;
+        height: 90vh;
         background-color: black;
         display: flex;
         justify-content: flex-start;
@@ -72,7 +72,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 90%;
         background: rgba(0, 0, 0, 0.6);
         z-index: 1;
     }
@@ -92,7 +92,6 @@
         font-size: 24px;
         line-height: 0.5;
         margin-left: 5%;
-        text-transform: uppercase;
     }
 
     h2{
@@ -108,7 +107,7 @@
 <a href="/"><div class="branding"><b>CINE</b>PATH</div></a>
 <div class="banner" style="background-image: url('{backdropUrl}');">
     <div class="centered-text">
-        <h2>WELCOME BACK PRABH, HERE'S A RECOMMENDATION</h2>
+        <h2>Welcome back Prabh, here's a recommendation</h2>
         <h1>{movieName}</h1>
         <h2><div class="tags">{movieGenres}</div></h2>
         <AddMovie />

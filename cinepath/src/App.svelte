@@ -4,7 +4,8 @@
 
 <main>
     <WelcomeBanner />
-    <h1>Movie tracking here</h1>
+    <h1>Movie tracking here</h1> 
+
 </main>
 
 <style>

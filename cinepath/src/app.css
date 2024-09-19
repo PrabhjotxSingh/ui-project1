@@ -7,6 +7,8 @@ html {
   font-family: "Open Sans", sans-serif;
   margin: 0px;
   height: 100%;
+  background-color: black;
+  color: white;
 }
 
 textarea,
@@ -30,6 +32,24 @@ input[type="text"] {
   background-color: transparent;
   color: white;
 }
+
+.btn_close {
+  padding: 5px 20px;
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.btn_close:hover {
+  background-color: white;
+  color: black;
+}
+
 
 input {
   padding: 10px 10px;
