@@ -96,7 +96,8 @@
                     title: 'MOVIE ADDED',
                     text: 'Your movie is logged onto CINEPATH!',
                     icon: 'success',
-                    confirmButtonText: 'SICK!'
+                    confirmButtonText: 'SICK!',
+                    confirmButtonColor: "#000"
             })
         }
 
