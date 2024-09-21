@@ -3,6 +3,15 @@
   import Swal from "sweetalert2";
 
   let goal = 10;
+  let showEdit = false;
+  let editIndex = null;
+  let editName = "";
+  let editRating = 0;
+  let editUserReview = "";
+  let editSnack = "";
+  let editSnackThoughts = "";
+  let editPeopleAmount = 0;
+  let editPeopleThink = "";
 
   let movies = [
     {
@@ -15,7 +24,7 @@
       tags: ["Sci-Fi", "Drama", "Space"],
       posterUrl:
         "https://image.tmdb.org/t/p/w300/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-      snack: ["Popcorn,", "Candy"],
+      snack: ["Popcorn", "Candy"],
       snacks_exp: "It was okay, felt thirsty.",
       people_amount: 0,
       people_think: "I will show this to my family.",
@@ -86,6 +95,49 @@
   let now = new Date();
   const diffInMilliseconds = now.getTime() - firstReviewDate.getTime();
   const diffInDays = Math.round(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+  function toggleEdit(
+    movieName,
+    movieRating,
+    movieUserReview,
+    movieSnack,
+    movieSnackThoughts,
+    moviePeople,
+    moviePeopleThoughts,
+    index
+  ) {
+    showEdit = !showEdit;
+    if (showEdit) {
+      editIndex = index;
+      editName = movieName;
+      editRating = movieRating;
+      editUserReview = movieUserReview;
+      editSnack = movieSnack.join(", ");
+      editSnackThoughts = movieSnackThoughts;
+      editPeopleAmount = moviePeople;
+      editPeopleThink = moviePeopleThoughts;
+    } else {
+      editIndex = null;
+    }
+  }
+
+  function saveEdits() {
+    movies[editIndex] = {
+      ...movies[editIndex],
+      name: editName,
+      rating: editRating,
+      userReview: editUserReview,
+      snack: editSnack.split(",").map((item) => item.trim()),
+      snacks_exp: editSnackThoughts,
+      people_amount: editPeopleAmount,
+      people_think: editPeopleThink,
+    };
+    showEdit = false;
+  }
+
+  function hideAddMovie() {
+    showEdit = false;
+  }
 
   function handleAddMovie(event) {
     movies = [...movies, event.detail];
@@ -168,7 +220,15 @@
       allowEscapeKey: false,
     }).then((result) => {
       if (result.isDismissed) {
-        alert("EDIT");
+        toggleEdit(
+          movieName,
+          movieRating,
+          movieUserReview,
+          movieSnack,
+          movieSnackThoughts,
+          moviePeople,
+          moviePeopleThoughts,
+          index,);
       }
     });
   }
@@ -177,6 +237,20 @@
 </script>
 
 <main>
+  <div class="edit-popup {showEdit ? 'show' : ''}">
+    <div class="overlay"></div>
+    <div class="edit-container">
+      <h2>Edit {editName}</h2>
+      <p>Type in the fields below to edit content for this entry.</p>
+        <p>Your thoughts:</p>
+        <textarea bind:value={editUserReview}></textarea>
+        <br />
+        <br />
+      <button class="btn" on:click={hideAddMovie}>Cancel</button>
+      <button class="btn" on:click={saveEdits}>Save Changes</button>
+    </div>
+  </div>
+
   <div class="statscontainer">
     <a class="stats" on:click={statsButton} href="#stats">STATS</a>
   </div>
@@ -192,7 +266,7 @@
             openMovie(
               movie.name,
               movie.rating,
-              movie.userReviews,
+              movie.userReview,
               movie.snack,
               movie.snacks_exp,
               movie.people_amount,
@@ -218,6 +292,36 @@
 </main>
 
 <style>
+  .edit-popup {
+    display: none;
+  }
+  .edit-popup.show {
+    display: block;
+  }
+
+  .edit-container{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    z-index: 4;
+    background-color: rgb(0, 0, 0);
+    border-radius: 10px;
+    color: rgb(255, 255, 255);
+    padding: 20px 30px;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to bottom right, #000, #000);
+    opacity: 0.8;
+    z-index: 3;
+  }
+
   .statscontainer {
     position: absolute;
     top: 0;
@@ -228,6 +332,7 @@
   }
 
   .stats {
+    font-weight: 700;
     padding: 10px;
     background-color: white;
     color: black;

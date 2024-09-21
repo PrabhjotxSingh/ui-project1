@@ -439,6 +439,7 @@
   }
 
   .alwaysbtn {
+    font-weight: 700;
     position: fixed;
     right: 0;
     bottom: 0;
