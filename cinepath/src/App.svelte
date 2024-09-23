@@ -8,10 +8,11 @@
   let editName = "";
   let editRating;
   let editUserReview = "";
-  let editSnack = "";
+  let editSnack = [""];
   let editSnackThoughts = "";
   let editPeopleAmount = 0;
   let editPeopleThink = "";
+  let moreDetail = "";
 
   let movies = [
     {
@@ -111,7 +112,7 @@
       editName = movieName;
       editRating = movieRating;
       editUserReview = movieUserReview;
-      editSnack = movieSnack.join(", ");
+      editSnack = movieSnack;
       editSnackThoughts = movieSnackThoughts;
       editPeopleAmount = moviePeople;
       editPeopleThink = moviePeopleThoughts;
@@ -127,7 +128,7 @@
       name: editName,
       rating: editRating,
       userReview: editUserReview,
-      snack: editSnack.split(",").map((item) => item.trim()),
+      snack: editSnack,
       snacks_exp: editSnackThoughts,
       people_amount: editPeopleAmount,
       people_think: editPeopleThink,
@@ -208,13 +209,24 @@
     moviePeopleThoughts,
     index
   ) {
+    moreDetail = "";
+    if(movieSnack.length > 0 || movieSnackThoughts !== ""){
+      moreDetail = moreDetail + `During this movie you ate ${movieSnack.join(", ")}.<br />You stated: ${movieSnackThoughts}<br /><br />`;
+    }
+    else{
+      moreDetail = moreDetail + `No snack details were recorded.<br /><br />`;
+    }
+
+    if(moviePeopleThoughts !== ""){
+      moreDetail = moreDetail + `You watched this movie with ${moviePeople} other person(s).<br />You stated: ${moviePeopleThoughts}<br /><br />`;
+    }
+    else{
+      moreDetail = moreDetail + `No people details were recorded.<br /><br />`;
+    }
+
     Swal.fire({
       title: `${movieName.toUpperCase()}`,
-      html: `
-      During this movie you ate ${movieSnack.join(", ")}.<br />You stated: ${movieSnackThoughts}
-      <br /><br />
-      You watched this movie with ${moviePeople} other person(s).<br />You stated: ${moviePeopleThoughts}
-      `,
+      html: moreDetail,
       confirmButtonText: "DONE",
       confirmButtonColor: "#000",
       showCancelButton: true,
@@ -267,54 +279,20 @@
       <br /><br />
       <p>Select all the snacks you ate!</p>
       <div class="snack-selection">
-        <input
-          type="checkbox"
-          id="editPopcorn"
-          name="editSnack"
-          value="Popcorn"
-          bind:group={editSnack}
-        />
-        <label for="popcorn">Popcorn</label><br />
-        <input
-          type="checkbox"
-          id="editCandy"
-          name="editSnack"
-          value="Candy"
-          bind:group={editSnack}
-        />
-        <label for="candy">Candy</label><br />
-        <input
-          type="checkbox"
-          id="editNachos"
-          name="editSnack"
-          value="Nachos"
-          bind:group={editSnack}
-        />
-        <label for="nachos">Nachos</label><br />
-        <input
-          type="checkbox"
-          id="editSoda"
-          name="editSnack"
-          value="Soda"
-          bind:group={editSnack}
-        />
-        <label for="soda">Soda</label><br />
-        <input
-          type="checkbox"
-          id="editPretzels"
-          name="editSnack"
-          value="Pretzels"
-          bind:group={editSnack}
-        />
-        <label for="pretzels">Pretzels</label><br />
-        <input
-          type="checkbox"
-          id="editChips"
-          name="editSnack"
-          value="Chips"
-          bind:group={editSnack}
-        />
-        <label for="chips">Chips</label><br />
+        {#each ['Popcorn', 'Candy', 'Nachos', 'Soda', 'Pretzels', 'Chips'] as snack}
+          <input
+            type="checkbox"
+            id="edit{snack}"
+            value={snack}
+            checked={editSnack.includes(snack)}
+            on:change={() => {
+              editSnack = editSnack.includes(snack)
+                ? editSnack.filter(item => item !== snack)
+                : [...editSnack, snack];
+            }}
+          />
+          <label for="edit{snack}">{snack}</label><br />
+        {/each}
       </div>
       <br /><br />
       <p>Thoughts about the snacks:</p>
