@@ -209,20 +209,40 @@
     moviePeopleThoughts,
     index
   ) {
+
     moreDetail = "";
-    if(movieSnack.length > 0 || movieSnackThoughts !== ""){
-      moreDetail = moreDetail + `During this movie you ate ${movieSnack.join(", ")}.<br />You stated: ${movieSnackThoughts}<br /><br />`;
-    }
-    else{
-      moreDetail = moreDetail + `No snack details were recorded.<br /><br />`;
+
+    if (movieSnack.length > 0 || movieSnackThoughts.trim() !== "") {
+      if (movieSnack.length > 0) {
+        moreDetail += `During this movie you ate ${movieSnack.join(", ")}.<br />`;
+      } else {
+        moreDetail += `No snacks were recorded.<br />`;
+      }
+
+      if (movieSnackThoughts.trim() !== "") {
+        moreDetail += `You stated: ${movieSnackThoughts}<br /><br />`;
+      } else {
+        moreDetail += `No thoughts about snacks were recorded.<br /><br />`;
+      }
+    } else {
+      moreDetail += `Both snacks and details were not recorded.<br /><br />`;
     }
 
-    if(moviePeopleThoughts !== ""){
-      moreDetail = moreDetail + `You watched this movie with ${moviePeople} other person(s).<br />You stated: ${moviePeopleThoughts}<br /><br />`;
-    }
-    else{
-      moreDetail = moreDetail + `No people details were recorded.<br /><br />`;
-    }
+    if (moviePeople !== null || moviePeopleThoughts.trim() !== "") {
+      if (moviePeople !== null) {
+        moreDetail += `You watched this movie with ${moviePeople} other person(s).<br />`;
+      } else {
+        moreDetail += `No people details were recorded.<br />`;
+      }
+
+      if (moviePeopleThoughts.trim() !== "") {
+        moreDetail += `You stated: ${moviePeopleThoughts}<br /><br />`;
+      } else {
+        moreDetail += `No thoughts about people were recorded.<br /><br />`;
+      }
+    } else {
+      moreDetail += `Both people and details were not recorded.<br /><br />`;
+  }
 
     Swal.fire({
       title: `${movieName.toUpperCase()}`,

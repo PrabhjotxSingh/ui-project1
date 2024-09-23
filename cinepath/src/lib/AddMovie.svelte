@@ -146,10 +146,12 @@
 
   function toggleSnacks() {
     showSnacksSection = !showSnacksSection;
+    resetForm();
   }
 
   function togglePeople() {
     showPeopleSection = !showPeopleSection;
+    resetForm();
   }
 
   function toggleMovies() {
