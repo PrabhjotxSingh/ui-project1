@@ -17,6 +17,9 @@
   let selectedMovie = null;
   let moviePreview = "";
   let disableSearch = false;
+  let showEditPopup = false;
+  let showSnacksSection = true;
+  let showPeopleSection = true;
 
   function toggleAddMovie() {
     showAddMovie = !showAddMovie;
@@ -55,7 +58,7 @@
     searchQuery = "";
     movieResults = [];
     selectedMovie = null;
-    rating = "";
+    rating = "1";
     thoughts = "";
     datetime = new Date().toLocaleString();
     moviePreview = "";
@@ -92,17 +95,15 @@
       selectedMovie &&
       rating &&
       thoughts &&
-      snack.length > 0 &&
-      snacks_exp &&
-      people_amount >= 0 &&
-      people_think
+      (showSnacksSection ? snack.length > 0 && snacks_exp : true) &&
+      (showPeopleSection ? people_amount >= 0 && people_think : true)
     ) {
       const tags = selectedMovie.genre_ids.map(
         (id) => genreMap[id] || "Unknown"
       );
       dispatch("addMovie", {
         name: selectedMovie.title,
-        rating: rating,
+        rating: Number(rating),
         userReview: thoughts,
         reviewTime: datetime,
         description: selectedMovie.overview || "",
@@ -136,6 +137,31 @@
         allowEscapeKey: false,
       });
     }
+  }
+
+  function editActivities() {
+    showEditPopup = !showEditPopup;
+    hideAddMovie();
+  }
+
+  function toggleSnacks() {
+    showSnacksSection = !showSnacksSection;
+  }
+
+  function togglePeople() {
+    showPeopleSection = !showPeopleSection;
+  }
+
+  function toggleMovies() {
+    Swal.fire({
+      title: "UH OH!",
+      text: "Movies are the main thing here, you need them!",
+      icon: "error",
+      confirmButtonText: "OKAY",
+      confirmButtonColor: "#000",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
   }
 
   $: searchMovies(searchQuery);
@@ -174,7 +200,7 @@
       <div class="movie-list">
         {#each movieResults as movie}
           <button
-            class="movieoptions"
+            class="movieoptions sbutton"
             on:click={() => selectMovie(movie)}
             on:keydown={(e) => e.key === "Enter" && selectMovie(movie)}
             role="option"
@@ -238,96 +264,124 @@
       name="thoughts"
       bind:value={thoughts}
     />
-    <br /><br /><br />
-    <h3>NOW LET'S TALK SNACKS</h3>
-    <p>Select all the snacks you ate!</p>
-    <div class="snack-selection">
-      <input
-        type="checkbox"
-        id="popcorn"
-        name="snack"
-        value="Popcorn"
-        bind:group={snack}
+    <div class="snacksContainer" class:hide={!showSnacksSection}>
+      <br /><br /><br />
+      <h3>NOW LET'S TALK SNACKS</h3>
+      <p>Select all the snacks you ate!</p>
+      <div class="snack-selection">
+        <input
+          type="checkbox"
+          id="popcorn"
+          name="snack"
+          value="Popcorn"
+          bind:group={snack}
+        />
+        <label for="popcorn">Popcorn</label><br />
+        <input
+          type="checkbox"
+          id="candy"
+          name="snack"
+          value="Candy"
+          bind:group={snack}
+        />
+        <label for="candy">Candy</label><br />
+        <input
+          type="checkbox"
+          id="nachos"
+          name="snack"
+          value="Nachos"
+          bind:group={snack}
+        />
+        <label for="nachos">Nachos</label><br />
+        <input
+          type="checkbox"
+          id="soda"
+          name="snack"
+          value="Soda"
+          bind:group={snack}
+        />
+        <label for="soda">Soda</label><br />
+        <input
+          type="checkbox"
+          id="pretzels"
+          name="snack"
+          value="Pretzels"
+          bind:group={snack}
+        />
+        <label for="pretzels">Pretzels</label><br />
+        <input
+          type="checkbox"
+          id="chips"
+          name="snack"
+          value="Chips"
+          bind:group={snack}
+        />
+        <label for="chips">Chips</label><br />
+      </div>
+      <br /><br />
+      <p>Tell us your thoughts about the snacks?</p>
+      <textarea
+        placeholder="Start writing..."
+        id="snacks_exp"
+        name="snacks_exp"
+        bind:value={snacks_exp}
       />
-      <label for="popcorn">Popcorn</label><br />
+    </div>
+    <div class="peopleContainer" class:hide={!showPeopleSection}>
+      <br /><br /><br />
+      <h3>LASTLY, LET'S TALK PEOPLE</h3>
+      <p>How many people did you watch with?</p>
       <input
-        type="checkbox"
-        id="candy"
-        name="snack"
-        value="Candy"
-        bind:group={snack}
+        type="number"
+        id="people_amount"
+        name="people_amount"
+        bind:value={people_amount}
+        min="0"
+        max="100"
       />
-      <label for="candy">Candy</label><br />
-      <input
-        type="checkbox"
-        id="nachos"
-        name="snack"
-        value="Nachos"
-        bind:group={snack}
+      <br /><br /><br />
+      <p>
+        What did they think of the movie? If no one, can this movie be enjoyed
+        with others?
+      </p>
+      <textarea
+        placeholder="Start writing..."
+        id="people_think"
+        name="people_think"
+        bind:value={people_think}
       />
-      <label for="nachos">Nachos</label><br />
-      <input
-        type="checkbox"
-        id="soda"
-        name="snack"
-        value="Soda"
-        bind:group={snack}
-      />
-      <label for="soda">Soda</label><br />
-      <input
-        type="checkbox"
-        id="pretzels"
-        name="snack"
-        value="Pretzels"
-        bind:group={snack}
-      />
-      <label for="pretzels">Pretzels</label><br />
-      <input
-        type="checkbox"
-        id="chips"
-        name="snack"
-        value="Chips"
-        bind:group={snack}
-      />
-      <label for="chips">Chips</label><br />
     </div>
     <br /><br />
-    <p>Tell us your thoughts about the snacks?</p>
-    <textarea
-      placeholder="Start writing..."
-      id="snacks_exp"
-      name="snacks_exp"
-      bind:value={snacks_exp}
-    />
-    <br /><br /><br />
-    <h3>LASTLY, LET'S TALK PEOPLE</h3>
-    <p>How many people did you watch with?</p>
-    <input
-      type="number"
-      id="people_amount"
-      name="people_amount"
-      bind:value={people_amount}
-      min="0"
-      max="100"
-    />
-    <br /><br /><br />
-    <p>
-      What did they think of the movie? If no one, can this movie be enjoyed
-      with others?
-    </p>
-    <textarea
-      placeholder="Start writing..."
-      id="people_think"
-      name="people_think"
-      bind:value={people_think}
-    />
-    <br /><br /><br />
     <p>Log time: {datetime}</p>
-    <br /><br />
+    <br />
+    <a on:click={editActivities} href="#editactivity" class="btn">EDIT</a>
     <a on:click={submitForm} href="#add" class="btn">POST THIS ENTRY</a>
     <br /><br /><br />
   </div>
 </div>
+
+{#if showEditPopup}
+  <div class="overlay"></div>
+  <div class="editact-popup">
+    <h2>EDIT ACTIVITIES</h2>
+    <p>Adjust what you would like to see on the add movies panel.</p>
+    <button class="btn" on:click={toggleMovies}> HIDE MOVIES SECTION </button>
+    <br />
+    <br />
+    <button class="btn" on:click={toggleSnacks}>
+      {showSnacksSection ? "Hide Snacks Section" : "Show People Section"}
+    </button>
+    <br />
+    <br />
+    <button class="btn" on:click={togglePeople}>
+      {showPeopleSection ? "Hide People Section" : "Show People Section"}
+    </button>
+    <br />
+    <br />
+    <br />
+    <button class="btn" on:click={editActivities}>DONE</button>
+  </div>
+{/if}
 
 <style>
   .addmovie {
@@ -336,6 +390,7 @@
   .addmovie.show {
     display: block;
   }
+
   .moviepopup {
     position: fixed;
     z-index: 4;
@@ -361,50 +416,6 @@
     z-index: 3;
   }
 
-  .snack-selection {
-    display: flex;
-    direction: row;
-    align-items: center;
-  }
-
-  .snack-selection input[type="checkbox"] {
-    display: none;
-  }
-
-  .snack-selection label {
-    color: #6d6d6d;
-    cursor: pointer;
-    margin: 0 5px;
-  }
-
-  .snack-selection input[type="checkbox"]:checked + label {
-    color: #fff;
-  }
-
-  .star-rating {
-    display: flex;
-    direction: row;
-    align-items: center;
-  }
-
-  .star-rating input[type="radio"] {
-    display: none;
-  }
-
-  .star-rating label {
-    color: #fff;
-    cursor: pointer;
-    margin: 0 5px;
-  }
-
-  .star-rating input[type="radio"]:checked ~ label {
-    color: #fff;
-  }
-
-  .star-rating input[type="radio"]:checked ~ label ~ label {
-    color: #6d6d6d;
-  }
-
   .moviepreview {
     width: 300px;
     height: 400px;
@@ -419,7 +430,7 @@
     margin: 0;
   }
 
-  button {
+  .sbutton {
     margin: 4px;
     padding: 5px 20px;
     border-radius: 20px;
@@ -433,7 +444,7 @@
     transition: all 0.5s;
   }
 
-  button:hover {
+  .sbutton:hover {
     background-color: transparent;
     color: white;
   }
@@ -459,5 +470,24 @@
   .alwaysbtn:hover {
     background-color: transparent;
     color: white;
+  }
+
+  .editact-popup {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    z-index: 4;
+    border-radius: 10px;
+    color: rgb(255, 255, 255);
+    padding: 20px 30px;
+    backdrop-filter: blur(20px);
+    max-height: 60%;
+    overflow: auto;
+    font-size: 0.6;
+  }
+
+  .hide {
+    display: none;
   }
 </style>

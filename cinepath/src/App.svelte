@@ -6,7 +6,7 @@
   let showEdit = false;
   let editIndex = null;
   let editName = "";
-  let editRating = 0;
+  let editRating;
   let editUserReview = "";
   let editSnack = "";
   let editSnackThoughts = "";
@@ -108,7 +108,6 @@
   ) {
     showEdit = !showEdit;
     if (showEdit) {
-      editIndex = index;
       editName = movieName;
       editRating = movieRating;
       editUserReview = movieUserReview;
@@ -116,6 +115,7 @@
       editSnackThoughts = movieSnackThoughts;
       editPeopleAmount = moviePeople;
       editPeopleThink = moviePeopleThoughts;
+      editIndex = index;
     } else {
       editIndex = null;
     }
@@ -209,8 +209,12 @@
     index
   ) {
     Swal.fire({
-      title: `${movieName}`,
-      html: `During this movie you ate ${movieSnack.join(", ")}.<br />You stated: ${movieSnackThoughts}<br /><br />You watched this movie with ${moviePeople} other person(s).<br />You stated: ${moviePeopleThoughts}`,
+      title: `${movieName.toUpperCase()}`,
+      html: `
+      During this movie you ate ${movieSnack.join(", ")}.<br />You stated: ${movieSnackThoughts}
+      <br /><br />
+      You watched this movie with ${moviePeople} other person(s).<br />You stated: ${moviePeopleThoughts}
+      `,
       confirmButtonText: "DONE",
       confirmButtonColor: "#000",
       showCancelButton: true,
@@ -228,7 +232,8 @@
           movieSnackThoughts,
           moviePeople,
           moviePeopleThoughts,
-          index,);
+          index
+        );
       }
     });
   }
@@ -240,12 +245,95 @@
   <div class="edit-popup {showEdit ? 'show' : ''}">
     <div class="overlay"></div>
     <div class="edit-container">
-      <h2>Edit {editName}</h2>
+      <h2>EDIT {editName.toUpperCase()}</h2>
       <p>Type in the fields below to edit content for this entry.</p>
-        <p>Your thoughts:</p>
-        <textarea bind:value={editUserReview}></textarea>
-        <br />
-        <br />
+      <p>How many stars:</p>
+      <div class="star-rating">
+        {#each Array(5) as _, i}
+          <input
+            type="radio"
+            id="editStar{i + 1}"
+            name="editRating"
+            value={i + 1}
+            bind:group={editRating}
+          />
+          <label for="editStar{i + 1}">{i + 1} Star{i + 1 > 1 ? "s" : ""}</label
+          >
+        {/each}
+      </div>
+      <br /><br />
+      <p>Your thoughts:</p>
+      <textarea bind:value={editUserReview}></textarea>
+      <br /><br />
+      <p>Select all the snacks you ate!</p>
+      <div class="snack-selection">
+        <input
+          type="checkbox"
+          id="editPopcorn"
+          name="editSnack"
+          value="Popcorn"
+          bind:group={editSnack}
+        />
+        <label for="popcorn">Popcorn</label><br />
+        <input
+          type="checkbox"
+          id="editCandy"
+          name="editSnack"
+          value="Candy"
+          bind:group={editSnack}
+        />
+        <label for="candy">Candy</label><br />
+        <input
+          type="checkbox"
+          id="editNachos"
+          name="editSnack"
+          value="Nachos"
+          bind:group={editSnack}
+        />
+        <label for="nachos">Nachos</label><br />
+        <input
+          type="checkbox"
+          id="editSoda"
+          name="editSnack"
+          value="Soda"
+          bind:group={editSnack}
+        />
+        <label for="soda">Soda</label><br />
+        <input
+          type="checkbox"
+          id="editPretzels"
+          name="editSnack"
+          value="Pretzels"
+          bind:group={editSnack}
+        />
+        <label for="pretzels">Pretzels</label><br />
+        <input
+          type="checkbox"
+          id="editChips"
+          name="editSnack"
+          value="Chips"
+          bind:group={editSnack}
+        />
+        <label for="chips">Chips</label><br />
+      </div>
+      <br /><br />
+      <p>Thoughts about the snacks:</p>
+      <textarea bind:value={editSnackThoughts}></textarea>
+      <br /><br />
+      <p>How many people did you watch with:</p>
+      <input
+        type="number"
+        id="people_amount"
+        name="people_amount"
+        bind:value={editPeopleAmount}
+        min="0"
+        max="100"
+      />
+      <br /><br />
+      <p>What did they think, if no one can it be enjoyed with others:</p>
+      <textarea bind:value={editPeopleThink}></textarea>
+      <br />
+      <br />
       <button class="btn" on:click={hideAddMovie}>Cancel</button>
       <button class="btn" on:click={saveEdits}>Save Changes</button>
     </div>
@@ -299,16 +387,19 @@
     display: block;
   }
 
-  .edit-container{
+  .edit-container {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     position: fixed;
     z-index: 4;
-    background-color: rgb(0, 0, 0);
     border-radius: 10px;
     color: rgb(255, 255, 255);
     padding: 20px 30px;
+    backdrop-filter: blur(20px);
+    max-height: 60%;
+    overflow: auto;
+    font-size: 1.2em;
   }
 
   .overlay {
@@ -318,7 +409,7 @@
     width: 100%;
     height: 100%;
     background-image: linear-gradient(to bottom right, #000, #000);
-    opacity: 0.8;
+    opacity: 0.9;
     z-index: 3;
   }
 
